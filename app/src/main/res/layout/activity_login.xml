@@ -55,13 +55,13 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="183dp"
-        android:layout_height="167dp"
+        android:layout_height="197dp"
         android:layout_marginTop="64dp"
-        android:src="@drawable/logo"
+        android:background="@drawable/logowhite"
+        android:scaleType="centerInside"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/logo" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>

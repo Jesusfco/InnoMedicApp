@@ -64,6 +64,8 @@ public class PrincipalNav extends AppCompatActivity
         this.userName.setText(this.authUser.getName().toString());
         this.userEmail.setText(this.authUser.getEmail());
         this.userType.setText(this.authUser.userTypeName());
+
+        setTitle("Infantes Monitoreados");
     }
 
     @Override
