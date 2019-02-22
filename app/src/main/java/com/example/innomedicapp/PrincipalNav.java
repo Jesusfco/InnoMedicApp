@@ -32,7 +32,7 @@ public class PrincipalNav extends AppCompatActivity
 
     private AuthUser authUser;
 
-    private TextView userName, userEmail, userType;
+    private TextView userName, userEmail, userType, ctext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,9 @@ public class PrincipalNav extends AppCompatActivity
         this.userName = (TextView)headerView.findViewById(R.id.userName);
         this.userEmail = (TextView)headerView.findViewById(R.id.userEmail);
         this.userType = (TextView)headerView.findViewById(R.id.userType);
+        this.ctext = (TextView)findViewById(R.id.coordenates);
+
+        this.ctext.setText("pinche chus");
 
         this.userName.setText(this.authUser.getName().toString());
         this.userEmail.setText(this.authUser.getEmail());
@@ -159,6 +162,8 @@ public class PrincipalNav extends AppCompatActivity
 
         }
 
+        this.startLocationManager();
+
     }
 
     public void startLocationManager() {
@@ -170,6 +175,7 @@ public class PrincipalNav extends AppCompatActivity
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
                 //makeUseOfNewLocation(location);
+                PrincipalNav.this.ctext.setText("" + location.getAltitude() + " " + location.getLatitude());
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
