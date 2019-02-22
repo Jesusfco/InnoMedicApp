@@ -3,6 +3,7 @@
     package="com.example.innomedicapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -15,10 +16,6 @@
             android:name=".PrincipalNav"
             android:label="@string/title_activity_principal_nav"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
-            android:name=".navegation"
-            android:label="@string/title_activity_navegation"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".MainActivity"
