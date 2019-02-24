@@ -87,7 +87,6 @@ public class GPSTrackerThread extends Thread implements Runnable {
 
                             int permissionCheck = ContextCompat.checkSelfPermission(context,
                                     Manifest.permission.ACCESS_FINE_LOCATION);
-                            //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                             locationManager.requestSingleUpdate(criteria, locationListener, null);
 
                         }

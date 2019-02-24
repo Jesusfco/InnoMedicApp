@@ -34,10 +34,8 @@ public class PrincipalNav extends AppCompatActivity
 
     private AuthUser authUser;
 
-    private TextView userName, userEmail, userType, ctext;
+    private TextView userName, userEmail, userType;
 
-    LocationListener locationListener;
-    LocationManager locationManager;
     GPSTrackerThread gpsthread;
     private Handler handler = new Handler();
 
@@ -75,9 +73,6 @@ public class PrincipalNav extends AppCompatActivity
         this.userName = (TextView)headerView.findViewById(R.id.userName);
         this.userEmail = (TextView)headerView.findViewById(R.id.userEmail);
         this.userType = (TextView)headerView.findViewById(R.id.userType);
-        this.ctext = (TextView)findViewById(R.id.coordenates);
-
-        this.ctext.setText("pinche chus");
 
         this.userName.setText(this.authUser.getName().toString());
         this.userEmail.setText(this.authUser.getEmail());
@@ -169,7 +164,6 @@ public class PrincipalNav extends AppCompatActivity
 
         }
 
-        //this.startLocationManager();
         this.startGPSThread();
 
     }
@@ -179,33 +173,5 @@ public class PrincipalNav extends AppCompatActivity
         this.gpsthread.context = this;
         new Thread(this.gpsthread).start();
     }
-
-    public void startLocationManager() {
-        // Acquire a reference to the system Location Manager
-        this.locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        // Define a listener that responds to location updates
-        this.locationListener = new LocationListener() {
-
-            public void onLocationChanged(Location location) {
-
-                PrincipalNav.this.ctext.setText("" + location.getAltitude() + " " + location.getLatitude());
-                locationManager.removeUpdates(locationListener);
-
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-            public void onProviderEnabled(String provider) {}
-
-            public void onProviderDisabled(String provider) {}
-        };
-
-        // Register the listener with the Location Manager to receive location updates
-        int permissionCheck = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-    }
-
 
 }
