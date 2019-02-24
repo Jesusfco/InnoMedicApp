@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.innomedicapp.model.AuthUser;
+import com.example.innomedicapp.thread.GPSTrackerThread;
 
 public class PrincipalNav extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -33,6 +34,10 @@ public class PrincipalNav extends AppCompatActivity
     private AuthUser authUser;
 
     private TextView userName, userEmail, userType, ctext;
+
+    LocationListener locationListener;
+    LocationManager locationManager;
+    GPSTrackerThread gpsthread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,20 +167,29 @@ public class PrincipalNav extends AppCompatActivity
 
         }
 
-        this.startLocationManager();
+        //this.startLocationManager();
+        this.startGPSThread();
 
+    }
+
+    public void startGPSThread() {
+        this.gpsthread = new GPSTrackerThread();
+        this.gpsthread.context = this;
+        new Thread(this.gpsthread).start();
     }
 
     public void startLocationManager() {
         // Acquire a reference to the system Location Manager
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        this.locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         // Define a listener that responds to location updates
-        LocationListener locationListener = new LocationListener() {
+        this.locationListener = new LocationListener() {
+
             public void onLocationChanged(Location location) {
-                // Called when a new location is found by the network location provider.
-                //makeUseOfNewLocation(location);
+
                 PrincipalNav.this.ctext.setText("" + location.getAltitude() + " " + location.getLatitude());
+                locationManager.removeUpdates(locationListener);
+
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
