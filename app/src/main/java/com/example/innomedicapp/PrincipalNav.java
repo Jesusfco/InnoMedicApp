@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -38,6 +39,7 @@ public class PrincipalNav extends AppCompatActivity
     LocationListener locationListener;
     LocationManager locationManager;
     GPSTrackerThread gpsthread;
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +68,7 @@ public class PrincipalNav extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         SharedPreferences preferences = getSharedPreferences("data", Context.MODE_PRIVATE);
-        this.authUser = new AuthUser(preferences);
+        this.authUser = new AuthUser(this);
 
         View headerView = navigationView.getHeaderView(0);
 

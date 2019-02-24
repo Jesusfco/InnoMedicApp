@@ -1,5 +1,6 @@
 package com.example.innomedicapp.model;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 public class AuthUser {
@@ -11,7 +12,8 @@ public class AuthUser {
     public AuthUser() {
     }
 
-    public AuthUser(SharedPreferences pref) {
+    public AuthUser(Context context) {
+        SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
         this.id = pref.getInt("id", 0);
         this.user_type = pref.getInt("user_type", 0);
         this.name = pref.getString("name", "");
