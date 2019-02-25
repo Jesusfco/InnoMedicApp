@@ -26,6 +26,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.innomedicapp.fragments.AssosiationsFragment;
+import com.example.innomedicapp.fragments.PerfilFragment;
 import com.example.innomedicapp.model.AuthUser;
 import com.example.innomedicapp.thread.GPSTrackerThread;
 
@@ -78,8 +80,6 @@ public class PrincipalNav extends AppCompatActivity
         this.userEmail.setText(this.authUser.getEmail());
         this.userType.setText(this.authUser.userTypeName());
 
-        setTitle("Infantes Monitoreados");
-
         if(this.authUser.getUser_type() == 1)
             this.manageLocalitationLogic();
 
@@ -124,13 +124,18 @@ public class PrincipalNav extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_assosiations) {
-            // Handle the camera action
+            setTitle("Mis Contactos");
+            getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
+                    new AssosiationsFragment()).commit();
+
         } else if (id == R.id.nav_messages) {
 
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_perfil) {
-
+            setTitle("Mi Perfil");
+            getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
+                    new PerfilFragment()).commit();
         } else if (id == R.id.nav_close_session)
             this.closeSession();
 
