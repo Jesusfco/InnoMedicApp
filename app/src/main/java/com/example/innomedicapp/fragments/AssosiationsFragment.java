@@ -20,7 +20,7 @@ public class AssosiationsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.fragment_perfil, container, false);
+        return inflater.inflate(R.layout.fragment_assosiations, container, false);
 
     }
 

@@ -129,6 +129,9 @@ public class PrincipalNav extends AppCompatActivity
                     new AssosiationsFragment()).commit();
 
         } else if (id == R.id.nav_messages) {
+            setTitle("Mensajes");
+            getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
+                    new PerfilFragment()).commit();
 
         } else if (id == R.id.nav_manage) {
 
