@@ -83,6 +83,10 @@ public class PrincipalNav extends AppCompatActivity
         if(this.authUser.getUser_type() == 1)
             this.manageLocalitationLogic();
 
+        setTitle("Mis Contactos");
+        getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
+                new AssosiationsFragment()).commit();
+
     }
 
     @Override

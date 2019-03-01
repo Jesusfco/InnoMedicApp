@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity  {
                     @Override
                     public void onResponse(String response) {
 
-                        Intent newActivity = new Intent(context, PrincipalNav.class);
-                        startActivity(newActivity);
+                        Intent principal = new Intent(context, PrincipalNav.class);
+                        startActivity(principal);
                         finish();
 
                     }
@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity  {
                     public void onErrorResponse(VolleyError error) {
                         // error
                         System.out.println("Error.Response: " + error.getMessage());
-                        Intent newActivity = new Intent(context, LoginActivity.class);
-                        startActivity(newActivity);
+                        Intent login = new Intent(context, LoginActivity.class);
+                        startActivity(login);
                         finish();
 
                     }
@@ -74,13 +74,12 @@ public class MainActivity extends AppCompatActivity  {
             {
                 Map<String, String>  params = new HashMap<String, String>();
                 params.put("token", token);
-
-
                 return params;
             }
         };
-        queue.add(postRequest);
-    }
 
+        queue.add(postRequest);
+
+    }
 
 }

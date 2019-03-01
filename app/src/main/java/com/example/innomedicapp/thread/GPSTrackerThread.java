@@ -47,7 +47,7 @@ public class GPSTrackerThread extends Thread implements Runnable {
 
             public void onLocationChanged(Location location) {
 
-                System.out.println("" + location.getAltitude() + " " + location.getLatitude());
+
                 saveLocation(location);
 
             }

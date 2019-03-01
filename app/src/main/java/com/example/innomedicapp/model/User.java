@@ -1,11 +1,31 @@
 package com.example.innomedicapp.model;
 
-public class User {
+import org.json.JSONObject;
+
+import java.io.Serializable;
+
+public class User implements Serializable {
     private Integer id, user_type;
     private String name, email, password, phone, img;
     private boolean status;
 
     public User() {
+    }
+
+    public User(String string)  {
+        try {
+            JSONObject object = new JSONObject(string);
+            this.id = object.getInt("id");
+            this.user_type = object.getInt("user_type");
+            this.name = object.getString("name");
+            this.email = object.getString("email");
+            this.phone = object.getString("phone");
+            this.img = object.getString("img");
+
+            if(object.getInt("status") == 1) this.status = true;
+        }catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     public Integer getId() {
@@ -70,5 +90,17 @@ public class User {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getUserTypeName(){
+        if(this.user_type == 1)
+            return "Infante";
+        else if(this.user_type == 2)
+            return "Tutor";
+        else if(this.user_type == 3)
+            return "Externo";
+        else
+            return "Administrador";
+
     }
 }
