@@ -77,6 +77,8 @@ public class PrincipalNav extends AppCompatActivity
     private static  final String APP_NAME = "INNOMEDIC";
     private static  final UUID MY_UUID =  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    public SendReceive sendReceive;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -142,8 +144,8 @@ public class PrincipalNav extends AppCompatActivity
             } else  {
 
                 this.searchBracelet();
-                BluetoothStopThread blueStop = new BluetoothStopThread();
-                new Thread( blueStop ).start();
+                //BluetoothStopThread blueStop = new BluetoothStopThread();
+                //new Thread( blueStop ).start();
 
             }
 
@@ -169,9 +171,13 @@ private class SendReceive extends Thread {
                 tempIn = bluetoothSocket.getInputStream();
                 tempOut = bluetoothSocket.getOutputStream();
 
+
             }catch (IOException e){
                 System.out.println(e.getMessage());
             }
+
+            inputStream=tempIn;
+            outputStream =tempOut;
 
 
         }
@@ -181,8 +187,25 @@ private class SendReceive extends Thread {
             int bytes;
 
             while(true) {
-                inputStream.read(buffer);
-                handler.obtainMessage()
+
+                try {
+                    bytes = inputStream.read(buffer);
+                    handler.obtainMessage(STATE_MESSAGE_RECEIVED,bytes, -1, buffer).sendToTarget();
+                    Thread.sleep( 500 );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
+        public  void write(byte[] bytes) {
+            try {
+                outputStream.write( bytes );
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 }
@@ -209,6 +232,10 @@ private class SendReceive extends Thread {
                Message message = Message.obtain();
                message.what = STATE_CONNECTED;
                handlerBluetooth.sendMessage( message );
+
+               sendReceive = new SendReceive( socket );
+               sendReceive.start();
+
            } catch (IOException e) {
                System.out.println(e.getMessage());
                e.printStackTrace();
@@ -257,6 +284,8 @@ private class SendReceive extends Thread {
                      Message message = Message.obtain();
                      message.what = STATE_CONNECTED;
                      handlerBluetooth.sendMessage( message );
+                     sendReceive = new SendReceive( socket );
+                     sendReceive.start();
                     break;
                  }
 
@@ -282,6 +311,9 @@ private class SendReceive extends Thread {
                     bluetoothConnectionText.setText("Sin Conexión a la pulsera");
                     break;
                 case STATE_MESSAGE_RECEIVED:
+                    byte[] readBuff = (byte[]) message.obj;
+                    String tempMsg = new String(readBuff, 0, message.arg1);
+                    System.out.println(tempMsg);
                     break;
             }
             return true;
