@@ -1,8 +1,14 @@
 package com.example.innomedicapp;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,6 +16,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -23,6 +30,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,15 +39,43 @@ import com.example.innomedicapp.fragments.PerfilFragment;
 import com.example.innomedicapp.model.AuthUser;
 import com.example.innomedicapp.thread.GPSTrackerThread;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.UUID;
+
 public class PrincipalNav extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private AuthUser authUser;
 
-    private TextView userName, userEmail, userType;
+    private TextView userName, userEmail, userType, bluetoothConnectionText;
 
     GPSTrackerThread gpsthread;
+
     private Handler handler = new Handler();
+
+
+    //BLUETOOTH
+    String bluetoothName = "H-C-2010-06-01";
+    BluetoothDevice pulsera;
+    BluetoothAdapter bluetoothAdapter;
+    Intent btEnablingIntent;
+    ArrayList<String > stringArraList = new ArrayList<String>();
+    ArrayAdapter<String> arrayAdapter;
+
+    static final int STATE_LISTENING = 1;
+    static final int STATE_CONNECTING = 2;
+    static final int STATE_CONNECTED = 3;
+    static final int STATE_CONNECTION_FAILED=4;
+    static final int STATE_MESSAGE_RECEIVED=5;
+
+    int REQUEST_ENABLE_BLUETOOTH = 1;
+
+    private static  final String APP_NAME = "INNOMEDIC";
+    private static  final UUID MY_UUID =  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +111,12 @@ public class PrincipalNav extends AppCompatActivity
         this.userName = (TextView)headerView.findViewById(R.id.userName);
         this.userEmail = (TextView)headerView.findViewById(R.id.userEmail);
         this.userType = (TextView)headerView.findViewById(R.id.userType);
+        this.bluetoothConnectionText = (TextView)headerView.findViewById(R.id.bluetoothConnection);
 
         this.userName.setText(this.authUser.getName().toString());
         this.userEmail.setText(this.authUser.getEmail());
         this.userType.setText(this.authUser.userTypeName());
+
 
         if(this.authUser.getUser_type() == 1)
             this.manageLocalitationLogic();
@@ -86,6 +124,263 @@ public class PrincipalNav extends AppCompatActivity
         setTitle("Mis Contactos");
         getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
                 new AssosiationsFragment()).commit();
+
+        //BLUETOOTH ----------------------------------------------------------------------------------------------
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        btEnablingIntent = new Intent( BluetoothAdapter.ACTION_REQUEST_ENABLE );
+
+        if(bluetoothAdapter == null){
+            Toast.makeText( this, "Tu dispositivo no soporta la utilizacion del Bluetooth", Toast.LENGTH_LONG ).show();
+        } else {
+
+            if(!bluetoothAdapter.isEnabled()) {
+
+                Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                //REQUEST_ENABLE_BT = 1
+                startActivityForResult( enableBluetoothIntent, 1 );
+
+            } else  {
+
+                this.searchBracelet();
+                BluetoothStopThread blueStop = new BluetoothStopThread();
+                new Thread( blueStop ).start();
+
+            }
+
+        }
+
+
+
+    }
+
+private class SendReceive extends Thread {
+        private final BluetoothSocket bluetoothSocket;
+        private final InputStream inputStream;
+        private final OutputStream outputStream;
+
+        public  SendReceive(BluetoothSocket socket) {
+
+            bluetoothSocket = socket;
+            InputStream tempIn = null;
+            OutputStream tempOut = null;
+
+            try {
+
+                tempIn = bluetoothSocket.getInputStream();
+                tempOut = bluetoothSocket.getOutputStream();
+
+            }catch (IOException e){
+                System.out.println(e.getMessage());
+            }
+
+
+        }
+
+        public void run() {
+            byte[] buffer = new byte[1024];
+            int bytes;
+
+            while(true) {
+                inputStream.read(buffer);
+                handler.obtainMessage()
+            }
+        }
+}
+
+    private class ClientClass extends Thread {
+
+       private BluetoothDevice device;
+       private BluetoothSocket socket;
+
+       public ClientClass(BluetoothDevice device){
+
+           this.device = device;
+           try {
+               this.socket = device.createRfcommSocketToServiceRecord( MY_UUID);
+               //this.socket = device.createRfcommSocketToServiceRecord( MY_UUID);
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+       }
+
+       public void run(){
+           try{
+               socket.connect();
+               Message message = Message.obtain();
+               message.what = STATE_CONNECTED;
+               handlerBluetooth.sendMessage( message );
+           } catch (IOException e) {
+               System.out.println(e.getMessage());
+               e.printStackTrace();
+               Message message = Message.obtain();
+               message.what = STATE_CONNECTION_FAILED;
+               handlerBluetooth.sendMessage( message );
+
+           }
+       }
+
+
+
+    }
+
+    private class  ServerClass extends Thread {
+        private BluetoothServerSocket serverSocket;
+
+        public ServerClass() {
+            try {
+                serverSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord( APP_NAME, MY_UUID );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public  void run() {
+            BluetoothSocket socket = null;
+
+            while(socket==null) {
+
+                 try {
+                    Message message = Message.obtain();
+                    message.what = STATE_CONNECTING;
+                     handlerBluetooth.sendMessage( message );
+
+                    socket = serverSocket.accept();
+                 }catch (IOException e) {
+                     e.printStackTrace();
+                     Message message = Message.obtain();
+                     message.what = STATE_CONNECTION_FAILED;
+                     handlerBluetooth.sendMessage( message );
+                     Toast.makeText( PrincipalNav.this, "DESCONECTADO DE LA PULSERA", Toast.LENGTH_SHORT ).show();
+                 }
+
+                 if(socket!= null) {
+                     Message message = Message.obtain();
+                     message.what = STATE_CONNECTED;
+                     handlerBluetooth.sendMessage( message );
+                    break;
+                 }
+
+            }
+        }
+    }
+
+    //ESTADOS DE CONEXION BLUETOOTH-------------------------------- //ESTADOS DE CONEXION BLUETOOTH-------------------------------------
+    Handler handlerBluetooth = new Handler( new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message message) {
+            switch (message.what) {
+                case STATE_LISTENING:
+                    bluetoothConnectionText.setText("Buscando Pulsera");
+                    break;
+                case STATE_CONNECTING:
+                    bluetoothConnectionText.setText("Conectando");
+                    break;
+                case STATE_CONNECTED:
+                    bluetoothConnectionText.setText("Pulsera Conectada");
+                    break;
+                case STATE_CONNECTION_FAILED:
+                    bluetoothConnectionText.setText("Sin Conexión a la pulsera");
+                    break;
+                case STATE_MESSAGE_RECEIVED:
+                    break;
+            }
+            return true;
+        }
+    } );
+
+    //BLUETOOTH QUESTION USER IF WE CAN ENGINE BLUETOOTH ----------------------------------------------------------------------------------------------
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == 1) {
+
+            if(resultCode == RESULT_OK) { //BLUETOOTH IS ENABLED
+
+                Toast.makeText( this, "Bluetooth habilitado", Toast.LENGTH_SHORT ).show();
+                this.searchBracelet();
+                BluetoothStopThread blueStop = new BluetoothStopThread();
+                new Thread( blueStop ).start();
+
+            } else if(resultCode == RESULT_CANCELED){ //BLUETOOT ENABLING IS CANCELED
+
+                Toast.makeText( this, "El bluetooth no se encuentra habilitado es necesario habilitarlo para establecer conexion con la pulsera", Toast.LENGTH_LONG ).show();
+
+            }
+
+            else {
+
+                Toast.makeText( this, "Bluetooth", Toast.LENGTH_SHORT ).show();
+            }
+        }
+    }
+
+    public void searchBracelet() { //DISCOVER BLUETOOTH DEVICES
+        bluetoothAdapter.startDiscovery();
+
+        IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver( myReceiver, intentFilter );
+
+    }
+
+    public class BluetoothStopThread extends Thread implements Runnable {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep( 30000 );
+                bluetoothAdapter.cancelDiscovery();
+            }catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+    }
+
+    BroadcastReceiver myReceiver = new BroadcastReceiver() { //THREAD SCAN BLUETOOTH FOR DEVICES
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(BluetoothDevice.ACTION_FOUND.equals( action )) {
+                BluetoothDevice device = intent.getParcelableExtra( BluetoothDevice.EXTRA_DEVICE );
+                stringArraList.add(device.getName());
+                System.out.println(device.getName());
+                if(device.getName().equals( bluetoothName )) {
+                    try {
+
+                        ClientClass clientClass = new ClientClass( device );
+                        clientClass.start();
+                        bluetoothConnectionText.setText("Conectando");
+
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                    bluetoothAdapter.cancelDiscovery();
+                    Toast.makeText( PrincipalNav.this, "Conectado con la pulsera", Toast.LENGTH_SHORT ).show();
+
+                }
+                //arrayAdapter.notifyDataSetChanged();
+            }
+
+        }
+
+    };
+
+    public void getListBluetoothPaired() { //LIST PAIRED
+
+        Set<BluetoothDevice> bt = bluetoothAdapter.getBondedDevices();
+        String[] devices = new String[bt.size()];
+        int index = 0;
+
+        if(bt.size() > 0) {
+
+            for(BluetoothDevice device: bt) {
+
+                devices[index] = device.getName();
+                index++;
+
+            }
+
+        }
 
     }
 

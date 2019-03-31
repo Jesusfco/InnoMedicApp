@@ -1,11 +1,15 @@
 package com.example.innomedicapp;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.innomedicapp.fragments.PerfilFragment;
@@ -24,9 +28,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
+import java.util.UUID;
 
 public class MonitoringActivity extends FragmentActivity implements OnMapReadyCallback  {
 
@@ -38,7 +45,16 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
     MapView mMapView;
     GoogleMap mMap;
 
+
+
     TextView lastCoordanates, messageCreator, lastMessage, lastMessageTime, ppm, ppmTimeStamp;
+
+    String address = null , name=null;
+
+    BluetoothAdapter myBluetooth = null;
+    BluetoothSocket btSocket = null;
+    Set<BluetoothDevice> pairedDevices;
+    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,4 +132,6 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
         startActivity(newActivity);
 
     }
+
+
 }
