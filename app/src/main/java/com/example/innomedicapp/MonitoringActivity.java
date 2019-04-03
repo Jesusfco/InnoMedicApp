@@ -64,18 +64,19 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
 
         try {
             user = (User) getIntent().getSerializableExtra( "user" );
+
+            if(user.getUser_type() == 1)
+                this.mapProcess();
+            else  {
+                mMapView = (MapView)findViewById(  R.id.map);
+                mMapView.setVisibility( View.INVISIBLE );
+            }
         }catch (Exception e) {
             System.out.println(e);
         }
 
 
-        mMapView = (MapView)findViewById(  R.id.map);
 
-        if(mMapView != null) {
-            mMapView.onCreate( null );
-            mMapView.onResume();
-            mMapView.getMapAsync( this );
-        }
 
         this.lastCoordanates = (TextView) findViewById( R.id.lastCoordanates );
         this.messageCreator = (TextView) findViewById( R.id.messageCreator );
@@ -83,6 +84,19 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
         this.lastMessageTime = (TextView) findViewById( R.id.lastMessageTime );
         this.ppm = (TextView)findViewById( R.id.ppm );
         this.ppmTimeStamp = (TextView)findViewById( R.id.ppmTimeStamp );
+
+
+
+    }
+
+    public void mapProcess(){
+        mMapView = (MapView)findViewById(  R.id.map);
+
+        if(mMapView != null) {
+            mMapView.onCreate( null );
+            mMapView.onResume();
+            mMapView.getMapAsync( this );
+        }
 
         this.threadLocalitation = new LastLocationChildThread( this, this.user.getId());
         this.threadLocalitation.addObserver( new Observer() {
@@ -118,7 +132,6 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
 
         localizationThread = new Thread(this.threadLocalitation);
         localizationThread.start();
-
     }
 
     @Override

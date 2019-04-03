@@ -21,6 +21,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -38,6 +39,7 @@ import com.example.innomedicapp.fragments.AssosiationsFragment;
 import com.example.innomedicapp.fragments.PerfilFragment;
 import com.example.innomedicapp.model.AuthUser;
 import com.example.innomedicapp.thread.GPSTrackerThread;
+import com.example.innomedicapp.util.BluetoothSerial;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,7 +53,7 @@ public class PrincipalNav extends AppCompatActivity
 
     private AuthUser authUser;
 
-    private TextView userName, userEmail, userType, bluetoothConnectionText;
+    private TextView userName, userEmail, userType, bluetoothConnectionText, battery, heart;
 
     GPSTrackerThread gpsthread;
 
@@ -60,7 +62,7 @@ public class PrincipalNav extends AppCompatActivity
 
     //BLUETOOTH
     String bluetoothName = "H-C-2010-06-01";
-    BluetoothDevice pulsera;
+
     BluetoothAdapter bluetoothAdapter;
     Intent btEnablingIntent;
     ArrayList<String > stringArraList = new ArrayList<String>();
@@ -76,6 +78,10 @@ public class PrincipalNav extends AppCompatActivity
 
     private static  final String APP_NAME = "INNOMEDIC";
     private static  final UUID MY_UUID =  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    BluetoothSerial bluetoothSerial;
+    private BluetoothConnectReceiver bluetoothConnectReceiver = new BluetoothConnectReceiver();
+    private BluetoothDisconnectReceiver bluetoothDisconnectReceiver = new BluetoothDisconnectReceiver();
 
     public SendReceive sendReceive;
 
@@ -114,20 +120,28 @@ public class PrincipalNav extends AppCompatActivity
         this.userEmail = (TextView)headerView.findViewById(R.id.userEmail);
         this.userType = (TextView)headerView.findViewById(R.id.userType);
         this.bluetoothConnectionText = (TextView)headerView.findViewById(R.id.bluetoothConnection);
+        this.heart = (TextView)headerView.findViewById(R.id.heart);
+        this.battery = (TextView)headerView.findViewById(R.id.battery);
 
         this.userName.setText(this.authUser.getName().toString());
         this.userEmail.setText(this.authUser.getEmail());
         this.userType.setText(this.authUser.userTypeName());
 
-
-        if(this.authUser.getUser_type() == 1)
+        //SEND LOCALIZATION CONSTANTLY
+        if(this.authUser.getUser_type() == 1) {
+            this.startBluetooth();
             this.manageLocalitationLogic();
+        }
+
 
         setTitle("Mis Contactos");
         getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
                 new AssosiationsFragment()).commit();
 
-        //BLUETOOTH ----------------------------------------------------------------------------------------------
+
+    }
+
+    public void startBluetooth() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         btEnablingIntent = new Intent( BluetoothAdapter.ACTION_REQUEST_ENABLE );
 
@@ -142,20 +156,69 @@ public class PrincipalNav extends AppCompatActivity
                 startActivityForResult( enableBluetoothIntent, 1 );
 
             } else  {
-
-                this.searchBracelet();
-                //BluetoothStopThread blueStop = new BluetoothStopThread();
-                //new Thread( blueStop ).start();
-
+                this.setBluetoothConection();
             }
 
         }
+    }
+
+    public void setBluetoothConection() {
 
 
+        bluetoothConnectionText.setText( "Conectando..." );
+        bluetoothSerial = new BluetoothSerial(this, new BluetoothSerial.MessageHandler() {
+            @Override
+            public int read(int bufferSize, byte[] buffer) {
+                return doRead(bufferSize, buffer);
+            }
+        }, bluetoothName);
+
+        //Fired when connection is established and also fired when onResume is called if a connection is already established.
+        LocalBroadcastManager.getInstance(this).registerReceiver(bluetoothConnectReceiver, new IntentFilter(BluetoothSerial.BLUETOOTH_CONNECTED));
+        //Fired when the connection is lost
+        LocalBroadcastManager.getInstance(this).registerReceiver(bluetoothDisconnectReceiver, new IntentFilter(BluetoothSerial.BLUETOOTH_DISCONNECTED));
+        //Fired when connection can not be established, after 30 attempts.
+        LocalBroadcastManager.getInstance(this).registerReceiver(bluetoothDisconnectReceiver, new IntentFilter(BluetoothSerial.BLUETOOTH_FAILED));
 
     }
 
-private class SendReceive extends Thread {
+    public int  doRead(int bufferSize, byte[] buffer){
+
+        String data = new String( buffer, 0, bufferSize );
+        System.out.println(data);
+        try {
+            String[] parts = data.split(":");
+            if(parts[0].toString().equals( "CORAZON" )) {
+                this.heart.setText( parts[1] + " ppm" );
+            } else if(parts[0].toString().equals( "BATERIA" )) {
+                this.battery.setText( "Brazalete " + Math.round(Double.valueOf(parts[1])) + " % de carga" );
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+
+        return bufferSize;
+    }
+
+    public class BluetoothConnectReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            bluetoothConnectionText.setText( "Pulsera Conectada" );
+        }
+    }
+
+    public class BluetoothDisconnectReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            bluetoothConnectionText.setText( "Sin Conexion" );
+        }
+
+    }
+
+
+    private class SendReceive extends Thread {
         private final BluetoothSocket bluetoothSocket;
         private final InputStream inputStream;
         private final OutputStream outputStream;
@@ -183,19 +246,31 @@ private class SendReceive extends Thread {
         }
 
         public void run() {
-            byte[] buffer = new byte[1024];
+            //byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[256];
+
             int bytes;
 
             while(true) {
 
+
                 try {
-                    bytes = inputStream.read(buffer);
-                    handler.obtainMessage(STATE_MESSAGE_RECEIVED,bytes, -1, buffer).sendToTarget();
-                    Thread.sleep( 500 );
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    if(inputStream.available() == 1) {
+                        bytes = inputStream.read(buffer);
+                        String readMessage = new String(buffer, 0, bytes);
+                        System.out.println(readMessage);
+                        //handler.obtainMessage(STATE_MESSAGE_RECEIVED,bytes, -1, buffer).sendToTarget();
+                    } else {
+                        Thread.sleep( 100 );
+                    }
+
+
+                    //}
+
+
+
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
 
             }
@@ -219,6 +294,8 @@ private class SendReceive extends Thread {
 
            this.device = device;
            try {
+
+
                this.socket = device.createRfcommSocketToServiceRecord( MY_UUID);
                //this.socket = device.createRfcommSocketToServiceRecord( MY_UUID);
            } catch (IOException e) {
@@ -229,12 +306,20 @@ private class SendReceive extends Thread {
        public void run(){
            try{
                socket.connect();
-               Message message = Message.obtain();
-               message.what = STATE_CONNECTED;
-               handlerBluetooth.sendMessage( message );
 
-               sendReceive = new SendReceive( socket );
-               sendReceive.start();
+               if(socket.isConnected()) {
+                   Message message = Message.obtain();
+                   message.what = STATE_CONNECTED;
+                   handlerBluetooth.sendMessage( message );
+
+                   sendReceive = new SendReceive( socket );
+                   sendReceive.start();
+               } else {
+                   Message message = Message.obtain();
+                   message.what = STATE_CONNECTION_FAILED;
+                   handlerBluetooth.sendMessage( message );
+               }
+
 
            } catch (IOException e) {
                System.out.println(e.getMessage());
@@ -277,7 +362,7 @@ private class SendReceive extends Thread {
                      Message message = Message.obtain();
                      message.what = STATE_CONNECTION_FAILED;
                      handlerBluetooth.sendMessage( message );
-                     Toast.makeText( PrincipalNav.this, "DESCONECTADO DE LA PULSERA", Toast.LENGTH_SHORT ).show();
+
                  }
 
                  if(socket!= null) {
@@ -329,9 +414,7 @@ private class SendReceive extends Thread {
             if(resultCode == RESULT_OK) { //BLUETOOTH IS ENABLED
 
                 Toast.makeText( this, "Bluetooth habilitado", Toast.LENGTH_SHORT ).show();
-                this.searchBracelet();
-                BluetoothStopThread blueStop = new BluetoothStopThread();
-                new Thread( blueStop ).start();
+                this.setBluetoothConection();
 
             } else if(resultCode == RESULT_CANCELED){ //BLUETOOT ENABLING IS CANCELED
 
@@ -348,7 +431,6 @@ private class SendReceive extends Thread {
 
     public void searchBracelet() { //DISCOVER BLUETOOTH DEVICES
         bluetoothAdapter.startDiscovery();
-
         IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver( myReceiver, intentFilter );
 
@@ -407,12 +489,45 @@ private class SendReceive extends Thread {
 
             for(BluetoothDevice device: bt) {
 
-                devices[index] = device.getName();
-                index++;
+                //devices[index] = device.getName();
+                //index++;
+
+                if(device.getName().equals( bluetoothName )) {
+                    try {
+
+                        ClientClass clientClass = new ClientClass( device );
+                        clientClass.start();
+                        bluetoothConnectionText.setText("Conectando");
+
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                    bluetoothAdapter.cancelDiscovery();
+                    Toast.makeText( PrincipalNav.this, "Conectado con la pulsera", Toast.LENGTH_SHORT ).show();
+
+                }
 
             }
 
         }
+
+    }
+
+    protected void onResume() {
+        super.onResume();
+
+        //onResume calls connect, it is safe
+        //to call connect even when already connected
+        bluetoothSerial.onResume();
+
+    }
+
+    protected void onPause() {
+
+        super.onPause();
+
+        bluetoothSerial.onPause();
 
     }
 
@@ -501,9 +616,11 @@ private class SendReceive extends Thread {
                     new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
 
+        } else {
+            this.startGPSThread();
         }
 
-        this.startGPSThread();
+
 
     }
 

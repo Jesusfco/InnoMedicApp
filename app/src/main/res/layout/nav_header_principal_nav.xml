@@ -41,6 +41,18 @@
         android:text="@string/nav_header_subtitle" />
 
     <TextView
+        android:id="@+id/battery"
+        android:layout_width="276dp"
+        android:layout_height="wrap_content"
+        android:text="Battery %%" />
+
+    <TextView
+        android:id="@+id/heart"
+        android:layout_width="261dp"
+        android:layout_height="wrap_content"
+        android:text="68 ppm" />
+
+    <TextView
         android:id="@+id/userType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

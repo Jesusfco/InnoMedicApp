@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity  {
                     public void onErrorResponse(VolleyError error) {
                         // error
                         System.out.println("Error.Response: " + error.getMessage());
+                        SharedPreferences pref = getSharedPreferences("data", Context.MODE_PRIVATE);
+                        pref.edit().remove("token").commit();
                         Intent login = new Intent(context, LoginActivity.class);
                         startActivity(login);
                         finish();
