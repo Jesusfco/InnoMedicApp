@@ -519,15 +519,17 @@ public class PrincipalNav extends AppCompatActivity
 
         //onResume calls connect, it is safe
         //to call connect even when already connected
-        bluetoothSerial.onResume();
+        if(this.authUser.getUser_type() == 1) bluetoothSerial.onResume();
 
     }
 
     protected void onPause() {
 
         super.onPause();
+        if(this.authUser.getUser_type() == 1) {
+            bluetoothSerial.onPause();
+        }
 
-        bluetoothSerial.onPause();
 
     }
 
