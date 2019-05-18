@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "420466389115",
+    "firebase_url": "https://inno-medic.firebaseio.com",
+    "project_id": "inno-medic",
+    "storage_bucket": "inno-medic.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420466389115:android:d3454706a7f78f57",
+        "android_client_info": {
+          "package_name": "com.example.innomedicapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "420466389115-7s4caj18mlif6lcns0u96imfq2it52d5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7QObUddfcePV1Ye_EOKOnu1mkxkNP6vQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "420466389115-7s4caj18mlif6lcns0u96imfq2it52d5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
