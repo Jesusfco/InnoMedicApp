@@ -59,6 +59,7 @@ public class PrincipalNav extends AppCompatActivity
 
     private Handler handler = new Handler();
 
+    int testCounter = 1;
 
     //BLUETOOTH
     String bluetoothName = "H-C-2010-06-01";
@@ -584,6 +585,15 @@ public class PrincipalNav extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_perfil) {
+
+            try {
+                bluetoothSerial.write("1".getBytes());
+                testCounter++;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             setTitle("Mi Perfil");
             getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
                     new PerfilFragment()).commit();
