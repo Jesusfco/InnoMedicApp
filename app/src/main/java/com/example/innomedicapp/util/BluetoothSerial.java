@@ -250,9 +250,14 @@ public class BluetoothSerial {
 		throw new RuntimeException("Connection lost, reconnecting now.");
 	}
 
-	public void write(byte[] buffer) throws IOException{
-		if (connected)
+	public boolean write(byte[] buffer) throws IOException{
+		if (connected) {
 			serialOutputStream.write(buffer);
+			return true;
+		}
+
+		return false;
+
 		
 		//throw new RuntimeException("Connection lost, reconnecting now.");
 	}

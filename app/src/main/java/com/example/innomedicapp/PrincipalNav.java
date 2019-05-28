@@ -62,29 +62,19 @@ public class PrincipalNav extends AppCompatActivity
     int testCounter = 1;
 
     //BLUETOOTH
-    String bluetoothName = "H-C-2010-06-01";
+    String bluetoothName;
 
     BluetoothAdapter bluetoothAdapter;
     Intent btEnablingIntent;
     ArrayList<String > stringArraList = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
 
-    static final int STATE_LISTENING = 1;
-    static final int STATE_CONNECTING = 2;
-    static final int STATE_CONNECTED = 3;
-    static final int STATE_CONNECTION_FAILED=4;
-    static final int STATE_MESSAGE_RECEIVED=5;
 
     int REQUEST_ENABLE_BLUETOOTH = 1;
-
-    private static  final String APP_NAME = "INNOMEDIC";
-    private static  final UUID MY_UUID =  UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     BluetoothSerial bluetoothSerial;
     private BluetoothConnectReceiver bluetoothConnectReceiver = new BluetoothConnectReceiver();
     private BluetoothDisconnectReceiver bluetoothDisconnectReceiver = new BluetoothDisconnectReceiver();
-
-    public SendReceive sendReceive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +132,8 @@ public class PrincipalNav extends AppCompatActivity
 
     }
 
+
+
     public void startBluetooth() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         btEnablingIntent = new Intent( BluetoothAdapter.ACTION_REQUEST_ENABLE );
@@ -164,7 +156,7 @@ public class PrincipalNav extends AppCompatActivity
     }
 
     public void setBluetoothConection() {
-
+        if(bluetoothName == null)return;
 
         bluetoothConnectionText.setText( "Conectando..." );
         bluetoothSerial = new BluetoothSerial(this, new BluetoothSerial.MessageHandler() {
@@ -219,192 +211,7 @@ public class PrincipalNav extends AppCompatActivity
     }
 
 
-    private class SendReceive extends Thread {
-        private final BluetoothSocket bluetoothSocket;
-        private final InputStream inputStream;
-        private final OutputStream outputStream;
 
-        public  SendReceive(BluetoothSocket socket) {
-
-            bluetoothSocket = socket;
-            InputStream tempIn = null;
-            OutputStream tempOut = null;
-
-            try {
-
-                tempIn = bluetoothSocket.getInputStream();
-                tempOut = bluetoothSocket.getOutputStream();
-
-
-            }catch (IOException e){
-                System.out.println(e.getMessage());
-            }
-
-            inputStream=tempIn;
-            outputStream =tempOut;
-
-
-        }
-
-        public void run() {
-            //byte[] buffer = new byte[1024];
-            byte[] buffer = new byte[256];
-
-            int bytes;
-
-            while(true) {
-
-
-                try {
-                    if(inputStream.available() == 1) {
-                        bytes = inputStream.read(buffer);
-                        String readMessage = new String(buffer, 0, bytes);
-                        System.out.println(readMessage);
-                        //handler.obtainMessage(STATE_MESSAGE_RECEIVED,bytes, -1, buffer).sendToTarget();
-                    } else {
-                        Thread.sleep( 100 );
-                    }
-
-
-                    //}
-
-
-
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-
-            }
-        }
-
-        public  void write(byte[] bytes) {
-            try {
-                outputStream.write( bytes );
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-}
-
-    private class ClientClass extends Thread {
-
-       private BluetoothDevice device;
-       private BluetoothSocket socket;
-
-       public ClientClass(BluetoothDevice device){
-
-           this.device = device;
-           try {
-
-
-               this.socket = device.createRfcommSocketToServiceRecord( MY_UUID);
-               //this.socket = device.createRfcommSocketToServiceRecord( MY_UUID);
-           } catch (IOException e) {
-               e.printStackTrace();
-           }
-       }
-
-       public void run(){
-           try{
-               socket.connect();
-
-               if(socket.isConnected()) {
-                   Message message = Message.obtain();
-                   message.what = STATE_CONNECTED;
-                   handlerBluetooth.sendMessage( message );
-
-                   sendReceive = new SendReceive( socket );
-                   sendReceive.start();
-               } else {
-                   Message message = Message.obtain();
-                   message.what = STATE_CONNECTION_FAILED;
-                   handlerBluetooth.sendMessage( message );
-               }
-
-
-           } catch (IOException e) {
-               System.out.println(e.getMessage());
-               e.printStackTrace();
-               Message message = Message.obtain();
-               message.what = STATE_CONNECTION_FAILED;
-               handlerBluetooth.sendMessage( message );
-
-           }
-       }
-
-
-
-    }
-
-    private class  ServerClass extends Thread {
-        private BluetoothServerSocket serverSocket;
-
-        public ServerClass() {
-            try {
-                serverSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord( APP_NAME, MY_UUID );
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public  void run() {
-            BluetoothSocket socket = null;
-
-            while(socket==null) {
-
-                 try {
-                    Message message = Message.obtain();
-                    message.what = STATE_CONNECTING;
-                     handlerBluetooth.sendMessage( message );
-
-                    socket = serverSocket.accept();
-                 }catch (IOException e) {
-                     e.printStackTrace();
-                     Message message = Message.obtain();
-                     message.what = STATE_CONNECTION_FAILED;
-                     handlerBluetooth.sendMessage( message );
-
-                 }
-
-                 if(socket!= null) {
-                     Message message = Message.obtain();
-                     message.what = STATE_CONNECTED;
-                     handlerBluetooth.sendMessage( message );
-                     sendReceive = new SendReceive( socket );
-                     sendReceive.start();
-                    break;
-                 }
-
-            }
-        }
-    }
-
-    //ESTADOS DE CONEXION BLUETOOTH-------------------------------- //ESTADOS DE CONEXION BLUETOOTH-------------------------------------
-    Handler handlerBluetooth = new Handler( new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message message) {
-            switch (message.what) {
-                case STATE_LISTENING:
-                    bluetoothConnectionText.setText("Buscando Pulsera");
-                    break;
-                case STATE_CONNECTING:
-                    bluetoothConnectionText.setText("Conectando");
-                    break;
-                case STATE_CONNECTED:
-                    bluetoothConnectionText.setText("Pulsera Conectada");
-                    break;
-                case STATE_CONNECTION_FAILED:
-                    bluetoothConnectionText.setText("Sin Conexión a la pulsera");
-                    break;
-                case STATE_MESSAGE_RECEIVED:
-                    byte[] readBuff = (byte[]) message.obj;
-                    String tempMsg = new String(readBuff, 0, message.arg1);
-                    System.out.println(tempMsg);
-                    break;
-            }
-            return true;
-        }
-    } );
 
     //BLUETOOTH QUESTION USER IF WE CAN ENGINE BLUETOOTH ----------------------------------------------------------------------------------------------
     @Override
@@ -430,107 +237,41 @@ public class PrincipalNav extends AppCompatActivity
         }
     }
 
-    public void searchBracelet() { //DISCOVER BLUETOOTH DEVICES
-        bluetoothAdapter.startDiscovery();
-        IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver( myReceiver, intentFilter );
 
-    }
-
-    public class BluetoothStopThread extends Thread implements Runnable {
-        @Override
-        public void run() {
-            try {
-                Thread.sleep( 30000 );
-                bluetoothAdapter.cancelDiscovery();
-            }catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-
-        }
-    }
-
-    BroadcastReceiver myReceiver = new BroadcastReceiver() { //THREAD SCAN BLUETOOTH FOR DEVICES
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if(BluetoothDevice.ACTION_FOUND.equals( action )) {
-                BluetoothDevice device = intent.getParcelableExtra( BluetoothDevice.EXTRA_DEVICE );
-                stringArraList.add(device.getName());
-                System.out.println(device.getName());
-                if(device.getName().equals( bluetoothName )) {
-                    try {
-
-                        ClientClass clientClass = new ClientClass( device );
-                        clientClass.start();
-                        bluetoothConnectionText.setText("Conectando");
-
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-
-                    bluetoothAdapter.cancelDiscovery();
-                    Toast.makeText( PrincipalNav.this, "Conectado con la pulsera", Toast.LENGTH_SHORT ).show();
-
-                }
-                //arrayAdapter.notifyDataSetChanged();
-            }
-
-        }
-
-    };
-
-    public void getListBluetoothPaired() { //LIST PAIRED
-
-        Set<BluetoothDevice> bt = bluetoothAdapter.getBondedDevices();
-        String[] devices = new String[bt.size()];
-        int index = 0;
-
-        if(bt.size() > 0) {
-
-            for(BluetoothDevice device: bt) {
-
-                //devices[index] = device.getName();
-                //index++;
-
-                if(device.getName().equals( bluetoothName )) {
-                    try {
-
-                        ClientClass clientClass = new ClientClass( device );
-                        clientClass.start();
-                        bluetoothConnectionText.setText("Conectando");
-
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-
-                    bluetoothAdapter.cancelDiscovery();
-                    Toast.makeText( PrincipalNav.this, "Conectado con la pulsera", Toast.LENGTH_SHORT ).show();
-
-                }
-
-            }
-
-        }
-
-    }
 
     protected void onResume() {
         super.onResume();
 
         //onResume calls connect, it is safe
         //to call connect even when already connected
-        if(this.authUser.getUser_type() == 1) bluetoothSerial.onResume();
+        if(this.authUser.getUser_type() == 1 && bluetoothSerial != null)
+            bluetoothSerial.onResume();
+
+
+        SharedPreferences preferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        String dev = preferences.getString("device", "");
+
+        if(this.authUser.getUser_type() == 1 && dev.length() > 0 && !dev.equals( bluetoothName )) {
+
+            bluetoothName = dev;
+
+            if(bluetoothSerial != null) {
+                this.bluetoothSerial.close();
+                this.bluetoothSerial = null;
+            }
+
+            this.setBluetoothConection();
+
+        }
 
     }
 
     protected void onPause() {
 
         super.onPause();
-        if(this.authUser.getUser_type() == 1) {
+        if(this.authUser.getUser_type() == 1 && bluetoothSerial != null) {
             bluetoothSerial.onPause();
         }
-
 
     }
 
@@ -553,13 +294,12 @@ public class PrincipalNav extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent monitoring = new Intent(this, BluetoothConfigActivity.class);
+            startActivity(monitoring);
             return true;
         }
 
@@ -585,14 +325,6 @@ public class PrincipalNav extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_perfil) {
-
-            try {
-                bluetoothSerial.write("1".getBytes());
-                testCounter++;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
             setTitle("Mi Perfil");
             getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
