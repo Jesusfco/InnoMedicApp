@@ -122,8 +122,8 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
         mMap = googleMap;
     }
 
-    public void chatView(View view){
-        Intent newActivity = new Intent(this, ChatActivity.class);
+    public void startNeckaceActivity(View view){
+        Intent newActivity = new Intent(this, InteractNecklaceActivity.class);
         startActivity(newActivity);
 
     }

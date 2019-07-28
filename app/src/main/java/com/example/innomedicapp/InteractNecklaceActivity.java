@@ -21,7 +21,7 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
     String bluetoothName;
     BluetoothSerial bluetoothSerial;
-    private TextView statusText, bluetoothView, dataView;
+    private TextView statusText, bluetoothView, batteryView, ppmView;
 
     private InteractNecklaceActivity.BluetoothConnectReceiver bluetoothConnectReceiver = new InteractNecklaceActivity.BluetoothConnectReceiver();
     private InteractNecklaceActivity.BluetoothDisconnectReceiver bluetoothDisconnectReceiver = new InteractNecklaceActivity.BluetoothDisconnectReceiver();
@@ -33,11 +33,12 @@ public class InteractNecklaceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_bluetooth_config );
+        setContentView( R.layout.activity_interact_necklace );
 
         this.bluetoothView = (TextView)findViewById( R.id.textView );
         this.statusText = (TextView)findViewById( R.id.textView2 );
-        this.dataView = (TextView)findViewById( R.id.textView3 );
+        this.batteryView = (TextView)findViewById( R.id.batteryView);
+        this.ppmView = (TextView)findViewById( R.id.ppmView);
 
         SharedPreferences preferences = getSharedPreferences("data", Context.MODE_PRIVATE);
         String dev = preferences.getString("device", "");
@@ -93,13 +94,33 @@ public class InteractNecklaceActivity extends AppCompatActivity {
         }
     }
 
+    private String quitLineJumpString(String s) {
+        if(s.contains("")) {
+            return s;
+        }
+
+        return s;
+    }
+
     public int  doRead(int bufferSize, byte[] buffer){
 
-        String mes = new String( buffer, 0, bufferSize );
+        String data = new String( buffer, 0, bufferSize );
 
-        this.dataView.setText( mes );
+        try {
+
+            String[] parts = data.split(":");
+            if(parts[0] == "B") {
+                this.batteryView.setText("Bateria: " + parts[1]);
+            } else if(parts[0] == "C") {
+                this.ppmView.setText("PPM: " + parts[1]);
+            }
+
+        } catch (Exception e) {
+
+        }
 
         return bufferSize;
+
     }
 
     public void alto(View v){
@@ -107,23 +128,19 @@ public class InteractNecklaceActivity extends AppCompatActivity {
     }
 
     public void regresa(View v){
-        this.sendThroughtBluetooth( 2 );
-    }
-
-    public void come(View v){
-        this.sendThroughtBluetooth( 3 );
-    }
-
-    public void pastilla(View v){
         this.sendThroughtBluetooth( 4 );
     }
 
-    public void reportate(View v){
+    public void come(View v){
         this.sendThroughtBluetooth( 5 );
     }
 
-    public void vibracion(View v){
-        this.sendThroughtBluetooth( 5 );
+    public void pastilla(View v){
+        this.sendThroughtBluetooth( 3 );
+    }
+
+    public void reportate(View v){
+        this.sendThroughtBluetooth( 2 );
     }
 
     private void sendThroughtBluetooth(Integer i) {
@@ -133,7 +150,7 @@ public class InteractNecklaceActivity extends AppCompatActivity {
             if(!bluetoothSerial.write( i.toString().getBytes() ) ) {
                 Toast.makeText( this, "No existe ninguna conexión a algun dispositivo", Toast.LENGTH_LONG ).show();
             } else {
-                InteractNecklaceActivity.ThreadBluetooth thread = new InteractNecklaceActivity.ThreadBluetooth( bluetoothSerial, "0", 1500 );
+                ThreadBluetooth thread = new ThreadBluetooth( bluetoothSerial, "0", 1500 );
                 thread.run();
             }
         } catch (IOException e) {
@@ -185,8 +202,11 @@ public class InteractNecklaceActivity extends AppCompatActivity {
             else {
 
                 Toast.makeText( this, "Bluetooth", Toast.LENGTH_SHORT ).show();
+
             }
+
         }
+
     }
 
     protected void onResume() {
@@ -254,7 +274,7 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
             try {
 
-                this.bluetoothSerial.write( "1".getBytes() );
+                this.bluetoothSerial.write( this.data.getBytes() );
 
             } catch (IOException e) {
                 e.printStackTrace();

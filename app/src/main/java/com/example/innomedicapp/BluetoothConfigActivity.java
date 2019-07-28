@@ -15,8 +15,6 @@ import android.widget.Toast;
 
 import com.example.innomedicapp.util.BluetoothSerial;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 
 public class BluetoothConfigActivity extends Activity {
@@ -38,7 +36,7 @@ public class BluetoothConfigActivity extends Activity {
 
         this.bluetoothView = (TextView)findViewById( R.id.textView );
         this.statusText = (TextView)findViewById( R.id.textView2 );
-        this.dataView = (TextView)findViewById( R.id.textView3 );
+        this.dataView = (TextView)findViewById( R.id.batteryView);
 
         SharedPreferences preferences = getSharedPreferences("data", Context.MODE_PRIVATE);
         String dev = preferences.getString("device", "");

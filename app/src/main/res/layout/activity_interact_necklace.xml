@@ -12,7 +12,7 @@
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="176dp"
-        android:onClick="alto"
+        android:onClick="come"
         android:text="Come"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,7 +23,7 @@
         android:layout_height="51dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="176dp"
-        android:onClick="regresa"
+        android:onClick="reportate"
         android:text="Reportate"
         app:layout_constraintStart_toEndOf="@+id/button2"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,7 +34,7 @@
         android:layout_height="46dp"
         android:layout_marginStart="72dp"
         android:layout_marginTop="40dp"
-        android:onClick="come"
+        android:onClick="regresa"
         android:text="Regresa"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button2" />
@@ -46,7 +46,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="184dp"
         android:layout_marginEnd="20dp"
-        android:onClick="pastilla"
+        android:onClick="alto"
         android:text="Alto"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -59,7 +59,7 @@
         android:layout_height="47dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="52dp"
-        android:onClick="reportate"
+        android:onClick="pastilla"
         android:text="Pastilla"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button7" />
@@ -91,7 +91,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/batteryView"
         android:layout_width="344dp"
         android:layout_height="30dp"
         android:layout_marginTop="96dp"
@@ -104,7 +104,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/ppmView"
         android:layout_width="344dp"
         android:layout_height="30dp"
         android:text="00 PPM"
@@ -113,5 +113,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/batteryView" />
 </android.support.constraint.ConstraintLayout>
