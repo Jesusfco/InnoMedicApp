@@ -132,8 +132,6 @@ public class PrincipalNav extends AppCompatActivity
 
     }
 
-
-
     public void startBluetooth() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         btEnablingIntent = new Intent( BluetoothAdapter.ACTION_REQUEST_ENABLE );
@@ -209,9 +207,6 @@ public class PrincipalNav extends AppCompatActivity
         }
 
     }
-
-
-
 
     //BLUETOOTH QUESTION USER IF WE CAN ENGINE BLUETOOTH ----------------------------------------------------------------------------------------------
     @Override

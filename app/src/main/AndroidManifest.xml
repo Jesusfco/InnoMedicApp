@@ -17,7 +17,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BluetoothSelectActivity"></activity>
+        <activity android:name=".InteractNecklaceActivity"></activity>
+        <activity android:name=".BluetoothSelectActivity" />
         <activity
             android:name=".BluetoothConfigActivity"
             android:label="@string/title_activity_bluetooth_config" />

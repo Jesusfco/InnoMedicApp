@@ -37,7 +37,6 @@ import java.util.UUID;
 
 public class MonitoringActivity extends FragmentActivity implements OnMapReadyCallback  {
 
-
     private LastLocationChildThread threadLocalitation;
     private static Thread localizationThread;
     private User user;
@@ -45,16 +44,7 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
     MapView mMapView;
     GoogleMap mMap;
 
-
-
-    TextView lastCoordanates, messageCreator, lastMessage, lastMessageTime, ppm, ppmTimeStamp;
-
-    String address = null , name=null;
-
-    BluetoothAdapter myBluetooth = null;
-    BluetoothSocket btSocket = null;
-    Set<BluetoothDevice> pairedDevices;
-    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    TextView lastCoordanates, ppm, ppmTimeStamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,17 +65,9 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
             System.out.println(e);
         }
 
-
-
-
         this.lastCoordanates = (TextView) findViewById( R.id.lastCoordanates );
-        this.messageCreator = (TextView) findViewById( R.id.messageCreator );
-        this.lastMessage = (TextView) findViewById( R.id.lastMessage );
-        this.lastMessageTime = (TextView) findViewById( R.id.lastMessageTime );
         this.ppm = (TextView)findViewById( R.id.ppm );
         this.ppmTimeStamp = (TextView)findViewById( R.id.ppmTimeStamp );
-
-
 
     }
 

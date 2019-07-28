@@ -38,71 +38,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/map" />
 
-            <ImageView
-                android:id="@+id/messageIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="81dp"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="28dp"
-                android:src="@drawable/messageimg"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lastCoordanates" />
-
-            <TextView
-                android:id="@+id/messageCreator"
-                android:layout_width="match_parent"
-                android:layout_height="23dp"
 
 
-                android:layout_marginEnd="8dp"
-                android:text="Alicia Perez Antonio"
-                android:textAlignment="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.428"
-                app:layout_constraintStart_toEndOf="@+id/messageIcon"
-                app:layout_constraintTop_toBottomOf="@+id/lastCoordanates" />
-
-            <TextView
-                android:id="@+id/lastMessage"
-                android:layout_width="match_parent"
-                android:layout_height="53dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:text="taken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/messageIcon"
-                app:layout_constraintTop_toBottomOf="@+id/messageCreator" />
-
-            <TextView
-                android:id="@+id/lastMessageTime"
-                android:layout_width="match_parent"
-                android:layout_height="21dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:text="10/01/01 10:20pm
-"
-                android:textAlignment="center"
-                android:textSize="10sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lastMessage" />
-
-            <Button
-                android:id="@+id/Mensajes"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="match_parent"
-                android:layout_height="37dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:background="@color/colorPrimary"
-                android:onClick="chatView"
-                android:text="Mensajes"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lastMessageTime" />
 
             <TextView
                 android:layout_width="401dp"
@@ -144,84 +81,11 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:background="@color/colorPrimary"
-                android:text="Historial Cardiaco"
+                android:background="@color/colorAccent"
+                android:text="Conectar a pulsera"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lastMessageTime" />
-
-
-
-
-
-
-
-                    <TextView
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="NOTIFICACIONES"
-                        android:textAlignment="center" />
-
-                    <Button
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        style="@style/Widget.AppCompat.Button.Colored"
-                        android:layout_width="wrap_content"
-                        android:layout_height="37dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@color/colorPrimary"
-                        android:text="Notificar Alto"/>
-
-                    <Button
-
-                        style="@style/Widget.AppCompat.Button.Colored"
-                        android:layout_width="wrap_content"
-                        android:layout_height="37dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@color/colorPrimary"
-                        android:text="Notificar Regresar"/>
-
-                    <Button
-
-                        style="@style/Widget.AppCompat.Button.Colored"
-                        android:layout_width="wrap_content"
-                        android:layout_height="37dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@color/colorPrimary"
-                        android:text="Alertar Peligro"/>
-
-                    <Button
-
-                        style="@style/Widget.AppCompat.Button.Colored"
-                        android:layout_width="wrap_content"
-                        android:layout_height="37dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@color/colorPrimary"
-                        android:text="Notificar Pastillas"/>
-
-                    <Button
-
-                        style="@style/Widget.AppCompat.Button.Colored"
-                        android:layout_width="172dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@color/colorPrimary"
-                        android:text="Notificar hora de comer" />
-
-
-
+                app:layout_constraintTop_toBottomOf="@+id/ppmTimeStamp" />
 
 
         </LinearLayout>
