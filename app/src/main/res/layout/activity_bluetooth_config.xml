@@ -8,71 +8,72 @@
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="119dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="140dp"
-        android:onClick="alto"
-        android:text="Alto"
+        android:layout_width="94dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="156dp"
+        android:onClick="come"
+        android:text="Come"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button3"
-        android:layout_width="112dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="140dp"
-        android:layout_marginEnd="56dp"
-        android:onClick="regresa"
-        android:text="Regresa"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="84dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="156dp"
+        android:onClick="tarea"
+        android:text="Tarea"
+        app:layout_constraintStart_toEndOf="@+id/button2"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button4"
         android:layout_width="116dp"
         android:layout_height="46dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="32dp"
-        android:onClick="come"
-        android:text="Come"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="24dp"
+        android:onClick="regresa"
+        android:text="Regresa"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button2" />
 
     <Button
         android:id="@+id/button7"
-        android:layout_width="116dp"
+        android:layout_width="81dp"
         android:layout_height="46dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginEnd="56dp"
-        android:onClick="pastilla"
-        android:text="Pastilla"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="160dp"
+        android:layout_marginEnd="20dp"
+        android:onClick="alto"
+        android:text="Alto"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
+        app:layout_constraintHorizontal_bias="0.125"
+        app:layout_constraintStart_toEndOf="@+id/button3"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button9"
-        android:layout_width="140dp"
-        android:layout_height="47dp"
-        android:layout_marginStart="132dp"
-        android:layout_marginTop="292dp"
-        android:layout_marginEnd="8dp"
-        android:onClick="reportate"
-        android:text="Resportate"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.022"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="101dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:onClick="pastilla"
+        android:text="Pastilla"
+        app:layout_constraintStart_toEndOf="@+id/button4"
+        app:layout_constraintTop_toBottomOf="@+id/button7" />
 
     <Button
         android:id="@+id/button6"
         style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="197dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="48dp"
+        android:layout_width="172dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
         android:onClick="vibracion"
         android:text="Vibracion"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button9" />
 

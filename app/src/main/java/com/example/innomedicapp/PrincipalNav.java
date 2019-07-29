@@ -312,12 +312,12 @@ public class PrincipalNav extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
                     new AssosiationsFragment()).commit();
 
-        } else if (id == R.id.nav_messages) {
+        /*} else if (id == R.id.nav_messages) {
             setTitle("Mensajes");
             getSupportFragmentManager().beginTransaction().replace(R.id.includeLayout,
                     new PerfilFragment()).commit();
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_manage) { */
 
         } else if (id == R.id.nav_perfil) {
 

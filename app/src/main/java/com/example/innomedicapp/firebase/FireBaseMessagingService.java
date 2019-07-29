@@ -20,13 +20,7 @@ public class FireBaseMessagingService extends FirebaseMessagingService {
 
             try {
 
-                Notification notification = new NotificationCompat.Builder(this)
-                        .setContentTitle(remoteMessage.getNotification().getTitle())
-                        .setContentText(remoteMessage.getNotification().getBody())
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .build();
-                NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
-                manager.notify(123, notification);
+
 
             }catch (Exception e) {
 

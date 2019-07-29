@@ -8,14 +8,11 @@
             android:id="@+id/nav_assosiations"
             android:icon="@drawable/ic_menu_camera"
             android:title="Contactos" />
-        <item
-            android:id="@+id/nav_messages"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Mensajes" />
-        <item
+
+        <!--<item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Mi Ubicación" />
+            android:title="Mi Ubicación" /> -->
     </group>
 
     <item android:title="Usuario">

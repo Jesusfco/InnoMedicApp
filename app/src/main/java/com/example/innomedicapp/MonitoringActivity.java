@@ -66,8 +66,8 @@ public class MonitoringActivity extends FragmentActivity implements OnMapReadyCa
         }
 
         this.lastCoordanates = (TextView) findViewById( R.id.lastCoordanates );
-        this.ppm = (TextView)findViewById( R.id.ppm );
-        this.ppmTimeStamp = (TextView)findViewById( R.id.ppmTimeStamp );
+        //this.ppm = (TextView)findViewById( R.id.ppm );
+        //this.ppmTimeStamp = (TextView)findViewById( R.id.ppmTimeStamp );
 
     }
 

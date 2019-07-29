@@ -109,10 +109,12 @@ public class InteractNecklaceActivity extends AppCompatActivity {
         try {
 
             String[] parts = data.split(":");
-            if(parts[0] == "B") {
-                this.batteryView.setText("Bateria: " + parts[1]);
-            } else if(parts[0] == "C") {
-                this.ppmView.setText("PPM: " + parts[1]);
+            String[] parts2 = parts[1].split("\r\n");
+            String da = parts2[0];
+            if(parts[0].equals("B")) {
+                this.batteryView.setText("Bateria: " + da + "%");
+            } else if(parts[0].equals("C")) {
+                this.ppmView.setText("PPM: " + da);
             }
 
         } catch (Exception e) {
@@ -151,7 +153,9 @@ public class InteractNecklaceActivity extends AppCompatActivity {
                 Toast.makeText( this, "No existe ninguna conexión a algun dispositivo", Toast.LENGTH_LONG ).show();
             } else {
                 ThreadBluetooth thread = new ThreadBluetooth( bluetoothSerial, "0", 1500 );
+                ThreadBluetooth thread2 = new ThreadBluetooth( bluetoothSerial, "0", 1700 );
                 thread.run();
+                thread2.run();
             }
         } catch (IOException e) {
             e.printStackTrace();

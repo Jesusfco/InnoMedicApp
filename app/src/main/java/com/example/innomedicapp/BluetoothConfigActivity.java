@@ -104,23 +104,23 @@ public class BluetoothConfigActivity extends Activity {
     }
 
     public void regresa(View v){
-        this.sendThroughtBluetooth( 2 );
-    }
-
-    public void come(View v){
-        this.sendThroughtBluetooth( 3 );
-    }
-
-    public void pastilla(View v){
         this.sendThroughtBluetooth( 4 );
     }
 
-    public void reportate(View v){
+    public void come(View v){
         this.sendThroughtBluetooth( 5 );
     }
 
+    public void pastilla(View v){
+        this.sendThroughtBluetooth( 3 );
+    }
+
+    public void tarea(View v){
+        this.sendThroughtBluetooth( 2 );
+    }
+
     public void vibracion(View v){
-        this.sendThroughtBluetooth( 5 );
+        this.sendThroughtBluetooth( 8 );
     }
 
     private void sendThroughtBluetooth(Integer i) {
@@ -131,7 +131,9 @@ public class BluetoothConfigActivity extends Activity {
                 Toast.makeText( this, "No existe ninguna conexión a algun dispositivo", Toast.LENGTH_LONG ).show();
             } else {
                 ThreadBluetooth thread = new ThreadBluetooth( bluetoothSerial, "0", 1500 );
+                ThreadBluetooth thread2 = new ThreadBluetooth( bluetoothSerial, "0", 1700 );
                 thread.run();
+                thread2.run();
             }
         } catch (IOException e) {
             e.printStackTrace();
