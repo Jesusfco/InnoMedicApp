@@ -376,4 +376,7 @@ public class BluetoothSerial {
 		
 	}
 
+	public boolean isConnected() {
+		return connected;
+	}
 }

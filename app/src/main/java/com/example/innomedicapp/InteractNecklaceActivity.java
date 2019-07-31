@@ -1,14 +1,19 @@
 package com.example.innomedicapp;
 
+import android.Manifest;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +24,7 @@ import java.io.IOException;
 
 public class InteractNecklaceActivity extends AppCompatActivity {
 
-    String bluetoothName;
+    String bluetoothName, phoneNumber;
     BluetoothSerial bluetoothSerial;
     private TextView statusText, bluetoothView, batteryView, ppmView;
 
@@ -49,11 +54,13 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
         this.receptionBlue.ppmView = this.ppmView;
         this.receptionBlue.batteryView = this.batteryView;
-
-
-
+        
         SharedPreferences preferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+
+        this.phoneNumber = preferences.getString("phoneNeckace", "");
+
         String dev = preferences.getString("device", "");
+
         if(dev.length() != 0) {
             bluetoothName = dev;
             this.bluetoothView.setText(  dev );
@@ -68,6 +75,7 @@ public class InteractNecklaceActivity extends AppCompatActivity {
             }
         });
 
+        this.checkForSmsPermission();
         this.startBluetooth();
     }
 
@@ -99,9 +107,10 @@ public class InteractNecklaceActivity extends AppCompatActivity {
             threadSend1 = new ThreadBluetooth(0, context, true);
             threadSend2 = new ThreadBluetooth(1500, context, false);
             threadSend3 = new ThreadBluetooth(1700, context, false);
-            threadSend1.bluetoothSerial = bluetoothSerial;
-            threadSend2.bluetoothSerial = bluetoothSerial;
-            threadSend3.bluetoothSerial = bluetoothSerial;
+
+            threadSend1.setBluetoothSerial(bluetoothSerial);
+            threadSend2.setBluetoothSerial(bluetoothSerial);
+            threadSend3.setBluetoothSerial(bluetoothSerial);
             threadSend2.data = "0";
             threadSend3.data = "0";
         }
@@ -124,11 +133,30 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
     public int  doRead(int bufferSize, byte[] buffer){
 
+        String data = new String( buffer, 0, bufferSize );
+
+        try {
+
+            String[] parts = data.split(":");
+            String[] parts2 = parts[1].split("\r\n");
+            String da = parts2[0];
+            if(parts[0].equals("B")) {
+                this.batteryView.setText("Bateria: " + da + "%");
+            } else if(parts[0].equals("C")) {
+                this.ppmView.setText("PPM: " + da);
+            }
+
+        } catch (Exception e) {
+
+        }
+
+        /*
 
         if(!this.receptionBlue.isAlive()) {
             this.receptionBlue.setBuffer(bufferSize, buffer);
             this.receptionBlue.run();
         }
+        */
 
         return bufferSize;
 
@@ -156,6 +184,7 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
     private void sendThroughtBluetooth(Integer i) {
 
+        if(this.bluetoothSerial.isConnected()) {
             if(this.threadSend3.isAlive()) {
                 Toast.makeText( this, "El bluetooth se encuentra ocupado enviando datos, espere un momento", Toast.LENGTH_LONG ).show();
             } else {
@@ -163,7 +192,31 @@ public class InteractNecklaceActivity extends AppCompatActivity {
                 this.threadSend1.run();
                 this.threadSend2.run();
                 this.threadSend3.run();
+                Toast.makeText( this, "Orden enviada por Bluetooth", Toast.LENGTH_SHORT ).show();
             }
+
+        } else  {
+
+            this.checkForSmsPermission();
+
+            if(this.phoneNumber.length() < 10) {
+                Toast.makeText( this, "Es necesario establecer el numero télefonico para usar esta funcionalidad sin conexión bluetooth", Toast.LENGTH_LONG ).show();
+                return;
+            }
+
+            String text = i.toString();
+
+            PendingIntent sentIntent = null, deliveryIntent = null;
+            // Check for permission first.
+            checkForSmsPermission();
+            // Use SmsManager.
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(this.phoneNumber, null, text,
+                    sentIntent, deliveryIntent);
+
+            Toast.makeText( this, "Orden enviada por SMS", Toast.LENGTH_SHORT ).show();
+
+        }
 
     }
 
@@ -216,6 +269,12 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.bluetoothSerial.close();
+    }
+
     protected void onResume() {
         super.onResume();
 
@@ -252,6 +311,17 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
     }
 
+    private void checkForSmsPermission() {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[] {Manifest.permission.SEND_SMS},
+                    1);
+
+        }
+    }
+
     public class ThreadBluetooth extends Thread {
 
         private BluetoothSerial bluetoothSerial;
@@ -266,7 +336,7 @@ public class InteractNecklaceActivity extends AppCompatActivity {
             this.principal = principal;
         }
 
-        private void setBluetoothSerial(BluetoothSerial s) {
+        public void setBluetoothSerial(BluetoothSerial s) {
             this.bluetoothSerial = s;
         }
 
@@ -345,7 +415,8 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
             }
 
-
         }
+
     }
+
 }

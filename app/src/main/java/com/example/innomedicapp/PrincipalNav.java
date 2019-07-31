@@ -120,7 +120,7 @@ public class PrincipalNav extends AppCompatActivity
 
         //SEND LOCALIZATION CONSTANTLY
         if(this.authUser.getUser_type() == 1) {
-            this.startBluetooth();
+            //this.startBluetooth();
             this.manageLocalitationLogic();
         }
 

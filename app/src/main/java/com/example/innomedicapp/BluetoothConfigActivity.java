@@ -1,15 +1,21 @@
 package com.example.innomedicapp;
 
+import android.Manifest;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.app.Activity;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.telephony.SmsManager;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +28,7 @@ public class BluetoothConfigActivity extends Activity {
     String bluetoothName;
     BluetoothSerial bluetoothSerial;
     private TextView statusText, bluetoothView, dataView;
+    private EditText phoneInput, messageInput;
 
     private BluetoothConnectReceiver bluetoothConnectReceiver = new BluetoothConnectReceiver();
     private BluetoothDisconnectReceiver bluetoothDisconnectReceiver = new BluetoothDisconnectReceiver();
@@ -38,8 +45,14 @@ public class BluetoothConfigActivity extends Activity {
         this.statusText = (TextView)findViewById( R.id.textView2 );
         this.dataView = (TextView)findViewById( R.id.batteryView);
 
+        this.phoneInput = (EditText)findViewById(R.id.numberPhone);
+        this.messageInput = (EditText)findViewById(R.id.messageInput);
+
         SharedPreferences preferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        this.phoneInput.setText(preferences.getString("phoneNeckace", ""));
+
         String dev = preferences.getString("device", "");
+
         if(dev.length() != 0) {
             bluetoothName = dev;
             this.bluetoothView.setText(  dev );
@@ -268,6 +281,57 @@ public class BluetoothConfigActivity extends Activity {
 
         }
 
+    }
+
+
+    public void savePhoneNecklace(View v) {
+
+        String phone = this.phoneInput.getText().toString().trim();
+        if(phone.length() < 10) {
+            Toast.makeText( this, "Ser requieren 10 digitos para guardar el numero telefonico", Toast.LENGTH_LONG ).show();
+            return;
+        }
+
+        SharedPreferences preferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("phoneNeckace", phone);
+        editor.commit();
+
+        Toast.makeText( this, "El número telefonico " + phone + " ha sido guardado correctamente", Toast.LENGTH_LONG ).show();
+
+    }
+
+    public void testMessage(View vi) {
+        this.checkForSmsPermission();
+        String phone = this.phoneInput.getText().toString().trim();
+        if(phone.length() < 10) {
+            Toast.makeText( this, "Ser requieren 10 digitos para guardar el numero telefonico", Toast.LENGTH_LONG ).show();
+            return;
+        }
+
+        String text = this.messageInput.getText().toString();
+
+        PendingIntent sentIntent = null, deliveryIntent = null;
+        // Check for permission first.
+        checkForSmsPermission();
+        // Use SmsManager.
+        SmsManager smsManager = SmsManager.getDefault();
+        smsManager.sendTextMessage(phone, null, text,
+                sentIntent, deliveryIntent);
+
+        Toast.makeText( this, "El mensaje ha sido enviado", Toast.LENGTH_SHORT ).show();
+
+    }
+
+    private void checkForSmsPermission() {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[] {Manifest.permission.SEND_SMS},
+                    1);
+
+        }
     }
 
 
