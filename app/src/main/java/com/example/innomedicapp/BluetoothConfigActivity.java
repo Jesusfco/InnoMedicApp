@@ -94,6 +94,7 @@ public class BluetoothConfigActivity extends Activity {
 
     public int  doRead(int bufferSize, byte[] buffer){
 
+
         String mes = new String( buffer, 0, bufferSize );
         this.dataView.setText( mes );
         return bufferSize;
@@ -236,7 +237,6 @@ public class BluetoothConfigActivity extends Activity {
         private BluetoothSerial bluetoothSerial;
         private String data;
         private Integer time;
-
 
         public ThreadBluetooth(BluetoothSerial bluetoothSerial, String data, Integer integer) {
             this.bluetoothSerial = bluetoothSerial;

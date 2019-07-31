@@ -29,16 +29,28 @@ public class InteractNecklaceActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private Intent btEnablingIntent;
 
+    private  ThreadBluetooth threadSend1, threadSend2, threadSend3;
+
+    private ReceptionBluetoothManage receptionBlue = new ReceptionBluetoothManage();
+
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_interact_necklace );
 
+        context = this;
+
         this.bluetoothView = (TextView)findViewById( R.id.textView );
         this.statusText = (TextView)findViewById( R.id.textView2 );
         this.batteryView = (TextView)findViewById( R.id.batteryView);
         this.ppmView = (TextView)findViewById( R.id.ppmView);
+
+        this.receptionBlue.ppmView = this.ppmView;
+        this.receptionBlue.batteryView = this.batteryView;
+
+
 
         SharedPreferences preferences = getSharedPreferences("data", Context.MODE_PRIVATE);
         String dev = preferences.getString("device", "");
@@ -84,6 +96,14 @@ public class InteractNecklaceActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             statusText.setText( "Estado: Conectado" );
+            threadSend1 = new ThreadBluetooth(0, context, true);
+            threadSend2 = new ThreadBluetooth(1500, context, false);
+            threadSend3 = new ThreadBluetooth(1700, context, false);
+            threadSend1.bluetoothSerial = bluetoothSerial;
+            threadSend2.bluetoothSerial = bluetoothSerial;
+            threadSend3.bluetoothSerial = bluetoothSerial;
+            threadSend2.data = "0";
+            threadSend3.data = "0";
         }
     }
 
@@ -104,21 +124,10 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
     public int  doRead(int bufferSize, byte[] buffer){
 
-        String data = new String( buffer, 0, bufferSize );
 
-        try {
-
-            String[] parts = data.split(":");
-            String[] parts2 = parts[1].split("\r\n");
-            String da = parts2[0];
-            if(parts[0].equals("B")) {
-                this.batteryView.setText("Bateria: " + da + "%");
-            } else if(parts[0].equals("C")) {
-                this.ppmView.setText("PPM: " + da);
-            }
-
-        } catch (Exception e) {
-
+        if(!this.receptionBlue.isAlive()) {
+            this.receptionBlue.setBuffer(bufferSize, buffer);
+            this.receptionBlue.run();
         }
 
         return bufferSize;
@@ -147,20 +156,14 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
     private void sendThroughtBluetooth(Integer i) {
 
-
-        try {
-            if(!bluetoothSerial.write( i.toString().getBytes() ) ) {
-                Toast.makeText( this, "No existe ninguna conexión a algun dispositivo", Toast.LENGTH_LONG ).show();
+            if(this.threadSend3.isAlive()) {
+                Toast.makeText( this, "El bluetooth se encuentra ocupado enviando datos, espere un momento", Toast.LENGTH_LONG ).show();
             } else {
-                ThreadBluetooth thread = new ThreadBluetooth( bluetoothSerial, "0", 1500 );
-                ThreadBluetooth thread2 = new ThreadBluetooth( bluetoothSerial, "0", 1700 );
-                thread.run();
-                thread2.run();
+                this.threadSend1.data = i.toString();
+                this.threadSend1.run();
+                this.threadSend2.run();
+                this.threadSend3.run();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
     }
 
@@ -252,14 +255,19 @@ public class InteractNecklaceActivity extends AppCompatActivity {
     public class ThreadBluetooth extends Thread {
 
         private BluetoothSerial bluetoothSerial;
-        private String data;
+        public String data;
         private Integer time;
+        private Context context;
+        private boolean principal;
 
-
-        public ThreadBluetooth(BluetoothSerial bluetoothSerial, String data, Integer integer) {
-            this.bluetoothSerial = bluetoothSerial;
-            this.data = data;
+        public ThreadBluetooth(Integer integer, Context ctx, boolean principal) {
             this.time = integer;
+            this.context = ctx;
+            this.principal = principal;
+        }
+
+        private void setBluetoothSerial(BluetoothSerial s) {
+            this.bluetoothSerial = s;
         }
 
         @Override
@@ -278,7 +286,12 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
             try {
 
-                this.bluetoothSerial.write( this.data.getBytes() );
+                if(!bluetoothSerial.write( this.data.getBytes() ) ) {
+
+                    if(this.principal)
+                        Toast.makeText( context, "No existe ninguna conexión a algun dispositivo", Toast.LENGTH_LONG ).show();
+                }
+
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -286,5 +299,53 @@ public class InteractNecklaceActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    public class ReceptionBluetoothManage extends Thread {
+
+        public int bufferSize;
+        public byte[] buffer;
+        public TextView batteryView, ppmView;
+
+        public ReceptionBluetoothManage(){ }
+
+        public void setBuffer(int bufferSize, byte[] buffer) {
+            this.bufferSize = bufferSize;
+            this.buffer = buffer;
+        }
+
+        @Override
+        public void run() {
+
+            try {
+
+                String data = new String( this.buffer, 0, this.bufferSize );
+
+                try {
+
+                    String[] parts = data.split(":");
+                    String[] parts2 = parts[1].split("\r\n");
+                    String da = parts2[0];
+                    if(parts[0].equals("B")) {
+                        this.batteryView.setText("Bateria: " + da + "%");
+                    } else if(parts[0].equals("C")) {
+                        this.ppmView.setText("PPM: " + da);
+                    }
+
+                } catch (Exception e) {
+
+                }
+
+                Thread.sleep(100);
+
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+
+        }
     }
 }
