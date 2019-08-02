@@ -153,7 +153,7 @@
         android:layout_marginEnd="8dp"
         android:ems="10"
         android:hint="Escribe un mensaje"
-        android:inputType="number|textPersonName"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"

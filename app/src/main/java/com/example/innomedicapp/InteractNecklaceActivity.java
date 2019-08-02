@@ -182,6 +182,10 @@ public class InteractNecklaceActivity extends AppCompatActivity {
         this.sendThroughtBluetooth( 2 );
     }
 
+    public void apagar(View v){
+        this.sendThroughtBluetooth( 0 );
+    }
+
     private void sendThroughtBluetooth(Integer i) {
 
         if(this.bluetoothSerial.isConnected()) {
@@ -190,9 +194,11 @@ public class InteractNecklaceActivity extends AppCompatActivity {
             } else {
                 this.threadSend1.data = i.toString();
                 this.threadSend1.run();
+                Toast.makeText( this, "Orden enviada por Bluetooth", Toast.LENGTH_SHORT ).show();
+                    if(i==0) return;
                 this.threadSend2.run();
                 this.threadSend3.run();
-                Toast.makeText( this, "Orden enviada por Bluetooth", Toast.LENGTH_SHORT ).show();
+
             }
 
         } else  {
